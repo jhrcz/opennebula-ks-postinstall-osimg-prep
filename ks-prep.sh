@@ -42,10 +42,17 @@ TPLID_KS=93
 TPLID_POSTINST=94
 
 echo "kickstart instance starting..."
-id=$(onetemplate instantiate $TPLID_KS | grep 'VM ID:' | cut -d : -f 2)
-#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
-echo "started ok, id=$id"
-#id=
+
+cmd_out=$(onetemplate instantiate $TPLID_KS 2>&1)
+id=$(echo "$cmd_out" | grep 'VM ID:' | cut -d : -f 2)
+if [ -n "$id" ]
+then
+	#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
+	echo "started ok, id=$id"
+else
+	echo "something get wrong, no, no vmid"
+	echo "$cmd_out" | sed -e 's,^,  :,g'
+fi
 
 echo "waiting for kickstart finish (vm shutdown results by UNKNOWN vm state)"
 while true
@@ -63,10 +70,16 @@ echo "delete ok"
 sleep 10
 
 echo "postinstall instance starting..."
-id=$(onetemplate instantiate $TPLID_POSTINST | grep 'VM ID:' | cut -d : -f 2)
-#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
-echo "started ok, id=$id"
-
+cmd_out=$(onetemplate instantiate $TPLID_POSTINST 2>&1)
+id=$(echo "$cmd_out" | grep 'VM ID:' | cut -d : -f 2)
+if [ -n "$id" ]
+then
+	#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
+	echo "started ok, id=$id"
+else
+	echo "something get wrong, no, no vmid"
+	echo "$cmd_out" | sed -e 's,^,  :,g'
+fi
 echo "prepard postinstall state vmid: $id"
 
 echo "waiting for check and snapprep (vm shutdown results by UNKNOWN vm state)"
