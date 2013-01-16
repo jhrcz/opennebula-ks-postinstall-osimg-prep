@@ -110,7 +110,7 @@ fi
 
 echo "prepard postinstall state vmid: $id"
 
-echo "waiting for check and snapprep (vm shutdown results by UNKNOWN vm state)"
+echo "waiting for manual check, mkinstaller snapprep and os shutdown (os shutdown results in UNKNOWN vm state in one)"
 
 if [ "$id" = "skip" ]
 then
@@ -124,5 +124,5 @@ else
 	done
 fi
 echo
-echo "vm shutdown detected, ready for cloning..."
+echo "os shutdown detected, vm volumes are ready for cloning..."
 
