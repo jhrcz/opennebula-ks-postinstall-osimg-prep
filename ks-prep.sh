@@ -24,6 +24,12 @@
 #   - after hacks are done, shutdown the machine
 # - when the machine is down / in UNKNOWN state / the volume could be cloned
 
+# basic env params for using non-hardcoded templates are:
+#    * TPLID_KS=93
+#    * TPLID_POSTINST=94
+#  real example:
+#    TPLID_KS=93 TPLID_POSTINST=94 bash ks-prep.sh
+
 # there is a way to skip some steps by using special variables
 #   * VMID_KS
 #   * VMID_POSINST
@@ -43,9 +49,11 @@
 # --->8---
 
 # one1-CentOS-6.3-x86_64-netinstall-persistent [KSINSTALLER] [DHCP]
-TPLID_KS=93
+[ -n "$TPLID_KS" ] || \
+	TPLID_KS=93
 # one1-CentOS-6.3-x86_64-postinstall-persistent [TEST-POOL]
-TPLID_POSTINST=94
+[ -n "$TPLID_POSTINST" ] || \
+	TPLID_POSTINST=94
 
 echo "kickstart instance starting..."
 
