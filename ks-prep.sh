@@ -59,6 +59,9 @@ echo "vm shutdown detected, deleting..."
 onevm delete $id
 echo "delete ok"
 
+# wait for persistent resources to be freed from previous vm
+sleep 10
+
 echo "postinstall instance starting..."
 id=$(onetemplate instantiate $TPLID_POSTINST | grep 'VM ID:' | cut -d : -f 2)
 #onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
