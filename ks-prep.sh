@@ -53,6 +53,7 @@ if [ -z "$VMID_KS" ]
 then
 	cmd_out=$(onetemplate instantiate $TPLID_KS 2>&1)
 	id=$(echo "$cmd_out" | grep 'VM ID:' | cut -d : -f 2)
+	id=${id//[[:space:]]}
 	if [ -n "$id" ]
 	then
 		#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
@@ -93,6 +94,7 @@ if [ -z "$VMID_KS" ]
 then
 	cmd_out=$(onetemplate instantiate $TPLID_POSTINST 2>&1)
 	id=$(echo "$cmd_out" | grep 'VM ID:' | cut -d : -f 2)
+	id=${id//[[:space:]]}
 	if [ -n "$id" ]
 	then
 		#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
