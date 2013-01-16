@@ -24,6 +24,12 @@
 #   - after hacks are done, shutdown the machine
 # - when the machine is down / in UNKNOWN state / the volume could be cloned
 
+# there is a way to skip some steps by using special variables
+#   * VMID_KS
+#   * VMID_POSINST
+# real example:
+#   VMID_KS=skip VMID_POSINST=631 bash ks-prep.sh
+
 # NOTES
 # ======
 #
@@ -43,52 +49,78 @@ TPLID_POSTINST=94
 
 echo "kickstart instance starting..."
 
-cmd_out=$(onetemplate instantiate $TPLID_KS 2>&1)
-id=$(echo "$cmd_out" | grep 'VM ID:' | cut -d : -f 2)
-if [ -n "$id" ]
+if [ -z "$VMID_KS" ]
 then
-	#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
-	echo "started ok, id=$id"
+	cmd_out=$(onetemplate instantiate $TPLID_KS 2>&1)
+	id=$(echo "$cmd_out" | grep 'VM ID:' | cut -d : -f 2)
+	if [ -n "$id" ]
+	then
+		#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
+		echo "started ok, id=$id"
+	else
+		echo "something get wrong, no, no vmid"
+		echo "$cmd_out" | sed -e 's,^,  :,g'
+	fi
 else
-	echo "something get wrong, no, no vmid"
-	echo "$cmd_out" | sed -e 's,^,  :,g'
+	id="$VMID_KS"
+	echo "using already requested vmid $id"
 fi
 
 echo "waiting for kickstart finish (vm shutdown results by UNKNOWN vm state)"
-while true
-do
-	onevm show $id | grep LCM_STATE | grep -q UNKNOWN && break
-	echo -n .
-	sleep 5
-done
-echo
-echo "vm shutdown detected, deleting..."
-onevm delete $id
-echo "delete ok"
+
+if [ "$id" = "skip" ]
+then
+	echo "skipping vm management as requested"
+else
+	while true
+	do
+		onevm show $id | grep LCM_STATE | grep -q UNKNOWN && break
+		echo -n .
+		sleep 5
+	done
+	echo
+	echo "vm shutdown detected, deleting..."
+	onevm delete $id
+	echo "delete ok"
+fi
 
 # wait for persistent resources to be freed from previous vm
 sleep 10
 
 echo "postinstall instance starting..."
-cmd_out=$(onetemplate instantiate $TPLID_POSTINST 2>&1)
-id=$(echo "$cmd_out" | grep 'VM ID:' | cut -d : -f 2)
-if [ -n "$id" ]
+
+if [ -z "$VMID_KS" ]
 then
-	#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
-	echo "started ok, id=$id"
+	cmd_out=$(onetemplate instantiate $TPLID_POSTINST 2>&1)
+	id=$(echo "$cmd_out" | grep 'VM ID:' | cut -d : -f 2)
+	if [ -n "$id" ]
+	then
+		#onevm show $id | grep LCM_STATE | grep RUNNING || exit 1
+		echo "started ok, id=$id"
+	else
+		echo "something get wrong, no, no vmid"
+		echo "$cmd_out" | sed -e 's,^,  :,g'
+	fi
 else
-	echo "something get wrong, no, no vmid"
-	echo "$cmd_out" | sed -e 's,^,  :,g'
+	id="$VMID_POSINST"
+	echo "using already requested vmid $id"
 fi
+
 echo "prepard postinstall state vmid: $id"
 
 echo "waiting for check and snapprep (vm shutdown results by UNKNOWN vm state)"
-while true
-do
-	onevm show $id | grep LCM_STATE | grep -q UNKNOWN && break
-	echo -n .
-	sleep 5
-done
+
+if [ "$id" = "skip" ]
+then
+	echo "skipping vm management as requested"
+else
+	while true
+	do
+		onevm show $id | grep LCM_STATE | grep -q UNKNOWN && break
+		echo -n .
+		sleep 5
+	done
+fi
 echo
 echo "vm shutdown detected, ready for cloning..."
 
