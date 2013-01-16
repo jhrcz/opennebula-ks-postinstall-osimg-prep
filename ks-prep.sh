@@ -36,7 +36,9 @@
 # LCM_STATE           : UNKNOWN             
 # --->8---
 
+# one1-CentOS-6.3-x86_64-netinstall-persistent [KSINSTALLER] [DHCP]
 TPLID_KS=93
+# one1-CentOS-6.3-x86_64-postinstall-persistent [TEST-POOL]
 TPLID_POSTINST=94
 
 echo "kickstart instance starting..."
