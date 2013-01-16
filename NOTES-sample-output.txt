@@ -1,25 +1,13 @@
-+ grep LCM_STATE
-+ grep UNKNOWN
-+ sleep 5
-+ true
-+ onevm show 621
-+ grep LCM_STATE
-+ grep UNKNOWN
-LCM_STATE           : UNKNOWN             
-+ break
-+ echo 'vm shutdown detected, deleting...'
+$  bash ks-prep.sh 
+kickstart instance starting...
+started ok, id=632
+waiting for kickstart finish (vm shutdown results by UNKNOWN vm state)
+........................................................................................
 vm shutdown detected, deleting...
-+ onevm delete 621
-+ echo 'delete ok'
 delete ok
-+ echo 'postinstall instance starting...'
 postinstall instance starting...
-++ onetemplate instantiate 94
-++ grep 'VM ID:'
-++ cut -d : -f 2
-+ id=' 622'
-+ echo 'started ok'
-started ok
-+ echo 'prepard postinstall state vmid:  622'
-prepard postinstall state vmid:  622
-
+started ok, id=633
+prepard postinstall state vmid: 633
+waiting for check and snapprep (vm shutdown results by UNKNOWN vm state)
+.....................................................................................................................................
+vm shutdown detected, ready for cloning...
